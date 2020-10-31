@@ -129,7 +129,7 @@ int main()
 		imshow("Sobel_" + image_names[i], Sobel_edges[i]);
 	}
 	
-		
+	//test
 		
 	waitKey(0);
 	return 0;
