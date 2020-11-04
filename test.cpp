@@ -2,8 +2,16 @@
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <stdio.h>
+#include "stdafx.h"
+#include "imatrix.h"
+#include "ETF.h"
+#include "fdog.h"
+#include "myvec.h"
+
 #define N 3
 using namespace cv;
+using namespace std;
 
 void conv2D(InputArray src, InputArray kernel, OutputArray dst, int ddepth,
 	Point anchor = Point(-1, -1), int borderType = BORDER_DEFAULT)
@@ -70,6 +78,9 @@ int main()
 	Mat Prewitt_edges[N];
 	Mat Sobel_edges[N];
 	Mat Canny_edges[N];
+	ETF e[N];
+	imatrix img[N];
+	Mat FDoG_edges[N];
 	images[0] = imread("./test.jpg");
 	images[1] = imread("./lena.jpg");
 	images[2] = imread("./TJU.jpg");
@@ -136,8 +147,85 @@ int main()
 		imshow("Canny_" + image_names[i], Canny_edges[i]);
 	}
 	
-	//test1
+	//FDoG实现
+	double tao = 0.99;
+	double thres = 0.7;
+	double sigma = 1.0;
+	double sigma3 = 3.0;
+
+	int wz = 15;
+	double colSig = 15.0;
+	double spaSig = 10.0;
+	int iterFDoG = 2;
+	
+	for (int s = 0;s < N;s++)
+	{
+		if (!images[s].data)
+		{
+			std::cout << "没有图片" << std::endl;
+			return -1;
+		}
+		//bilateral filtering
+		Mat filterImg;
+		//color sigma对降噪起了作用
+		bilateralFilter(grey_images[s], filterImg, wz, colSig, spaSig);
+	
 		
+		grey_images[s] = filterImg;
+	
+		cout << "rows: " << images[s].rows << "   " << "cols: " << images[s].cols << endl;
+		
+		int index;
+		img[s].init(images[s].rows, images[s].cols);
+	
+		for (int i = 0; i < images[s].rows; i++) {
+			img[s].p[i] = new int[images[s].cols];
+			for (int j = 0; j < images[s].cols; j++) {
+				index = i * images[s].cols + j;
+				img[s].p[i][j] = grey_images[s].data[index];
+			}
+		}
+	
+		int image_x = img[s].getRow();
+		int image_y = img[s].getCol();
+		
+		cout << e[s].Nr << " " << e[s].Nc<<endl;
+		e[s].init(image_x, image_y);
+		cout << e[s].Nr << " " << e[s].Nc << endl;
+	
+		e[s].set(img[s]);
+	
+		e[s].Smooth(4, 2);
+
+		GetFDoG(img[s], e[s], sigma, sigma3, tao);
+	
+		int pxVal;
+		for (int i = 0; i < iterFDoG; i++)
+		{
+			for (int j = 0; j < img[s].getRow(); j++)
+			{
+				for (int k = 0; k < img[s].getCol(); k++)
+				{
+					pxVal = (int)img[s][j][k] + (int)(grey_images[s].data[j * img[s].getCol() + k]);
+					if (pxVal > 255)
+						pxVal = 255;
+					img[s][j][k] = pxVal;
+				}
+			}
+			GetFDoG(img[s], e[s], sigma, sigma3, tao);
+		}
+		GrayThresholding(img[s], thres);
+
+		FDoG_edges[s] = grey_images[s];
+		for (int i = 0; i < images[s].rows; i++) {
+			for (int j = 0; j < images[s].cols; j++) {
+				index = i * images[s].cols + j;
+				FDoG_edges[s].data[index] = img[s].p[i][j];
+			}
+		}
+		imshow("FDog_"+ image_names[s], FDoG_edges[s]);
+	}
+	
 	waitKey(0);
 	return 0;
 

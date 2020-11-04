@@ -122,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,7 +148,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Project2\fdog.cpp" />
+    <ClCompile Include="..\Project2\stdafx.cpp" />
+    <ClCompile Include="ETF.cpp" />
     <ClCompile Include="test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Project2\fdog.h" />
+    <ClInclude Include="..\Project2\imatrix.h" />
+    <ClInclude Include="..\Project2\myvec.h" />
+    <ClInclude Include="..\Project2\stdafx.h" />
+    <ClInclude Include="..\Project2\targetver.h" />
+    <ClInclude Include="ETF.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
