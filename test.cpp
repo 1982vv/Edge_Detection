@@ -69,6 +69,7 @@ int main()
 	Mat grey_images[N];
 	Mat Prewitt_edges[N];
 	Mat Sobel_edges[N];
+	Mat Canny_edges[N];
 	images[0] = imread("./test.jpg");
 	images[1] = imread("./lena.jpg");
 	images[2] = imread("./TJU.jpg");
@@ -125,11 +126,17 @@ int main()
 
 	for (int i = 0;i < N;i++)
 	{
+		Canny(grey_images[i], Canny_edges[i], 80, 200);
+	}
+
+	for (int i = 0;i < N;i++)
+	{
 		imshow("prewitt_"+image_names[i], Prewitt_edges[i]);
 		imshow("Sobel_" + image_names[i], Sobel_edges[i]);
+		imshow("Canny_" + image_names[i], Canny_edges[i]);
 	}
 	
-	//test
+	//test1
 		
 	waitKey(0);
 	return 0;
